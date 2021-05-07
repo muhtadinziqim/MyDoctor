@@ -1,11 +1,18 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { colors, fonts } from '../../../utils'
+import IconOnly from './IconOnly'
 
-const Button = ({ type, title }) => {
+const Button = ({ type, title, onPress, icon }) => {
+    if(type == 'icon-only'){
+        return(
+            <IconOnly icon={icon} onPress={onPress} />
+        )
+    }
     return (
-        <View style={styles.container(type)}>
+        <TouchableOpacity style={styles.container(type)} onPress={onPress}>
             <Text style={styles.text(type)}>{title}</Text>
-        </View>
+        </TouchableOpacity>
     )
 }
 
@@ -14,13 +21,13 @@ export default Button
 const styles = StyleSheet.create({
     container: (type) => ({
         paddingVertical: 10,
-        backgroundColor: type === "primary" ? '#0BCAD4' : 'white',
+        backgroundColor: type === "secondary" ? colors.button.secondary.background : colors.button.primary.background,
         borderRadius: 10
     }),
     text: (type) => ({
         fontSize: 16,
         textAlign: 'center',
-        color: type === 'primary' ? 'white' : 'black',
-        fontFamily: 'Nunito-SemiBold'
+        color: type === 'secondary' ? colors.button.secondary.text : colors.button.primary.text,
+        fontFamily: fonts.primary[600]
     })
 })
