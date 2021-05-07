@@ -1,14 +1,27 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { ILCatUmum } from '../../../assets'
+import { ILCatObat, ILCatPsikiater, ILCatUmum } from '../../../assets'
 import { colors, fonts } from '../../../utils'
 
-const DoctorCategory = () => {
+const DoctorCategory = ({ category }) => {
+    const Icon = () => {
+        if (category === "dokter umum") {
+            return <ILCatUmum style={styles.illustration} />
+        }
+        if (category === "psikiater") {
+            return <ILCatPsikiater style={styles.illustration} />
+        }
+        if (category === "dokter obat") {
+            return <ILCatObat style={styles.illustration} />
+        }
+        return <ILCatUmum style={styles.illustration} />
+    }
+
     return (
         <View style={styles.container}>
-            <ILCatUmum style={styles.illustration} />
+            <Icon />
             <Text style={styles.label}>Saya butuh</Text>
-            <Text style={styles.category}>Dokter umum</Text>
+            <Text style={styles.category}>{category}</Text>
         </View>
     )
 }
@@ -33,7 +46,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.primary[300],
         color: colors.text.primary
     },
-    category:{
+    category: {
         fontSize: 12,
         fontFamily: fonts.primary[600],
         color: colors.text.primary
