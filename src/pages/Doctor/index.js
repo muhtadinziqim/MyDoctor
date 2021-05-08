@@ -3,16 +3,16 @@ import { StyleSheet, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { DoctorCategory, Gap, HomeProfile, NewsItem, RatedDoctor } from '../../components'
 import { colors, fonts } from '../../utils';
-import { JSONCategoryDoctor } from '../../assets'
+import { DummyDoctor6, JSONCategoryDoctor } from '../../assets'
 
-const Doctor = () => {
+const Doctor = ({navigation}) => {
     return (
         <View style={styles.page}>
             <View style={styles.content}>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <View style={styles.wrapperSection}>
                         <Gap height={30} />
-                        <HomeProfile />
+                        <HomeProfile onPress={() => navigation.navigate('UserProfile')} />
                         <Text style={styles.welcome}>Mau Konsultasi dengan siapa hari ini ?</Text>
                     </View>
                     <View style={styles.wrapperScroll}>
@@ -24,7 +24,8 @@ const Doctor = () => {
                                         return (
                                             <DoctorCategory
                                                 key={item.id}
-                                                category={item.category} />
+                                                category={item.category}
+                                                onPress={() => navigation.navigate("ChooseDoctor") } />
                                         )
                                     })
                                 }
@@ -34,9 +35,9 @@ const Doctor = () => {
                     </View>
                     <View style={styles.wrapperSection}>
                         <Text style={styles.sectionLabel}>Top Rated Doctor</Text>
-                        <RatedDoctor />
-                        <RatedDoctor />
-                        <RatedDoctor />
+                        <RatedDoctor name="Bagus Amaluddin" desc="Dokter Anak" avatar={DummyDoctor6} onPress={() => navigation.navigate("DoctorProfile")} />
+                        <RatedDoctor name="Bagus Amaluddin" desc="Dokter Anak" avatar={DummyDoctor6} onPress={() => navigation.navigate("DoctorProfile")} />
+                        <RatedDoctor name="Bagus Amaluddin" desc="Dokter Anak" avatar={DummyDoctor6} onPress={() => navigation.navigate("DoctorProfile")} />
                         <Text style={styles.sectionLabel}>Good News</Text>
                     </View>
                     <NewsItem />
