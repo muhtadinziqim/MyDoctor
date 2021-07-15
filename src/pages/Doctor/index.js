@@ -6,11 +6,7 @@ import { colors, fonts, getData } from '../../utils';
 import { DummyDoctor6, JSONCategoryDoctor } from '../../assets'
 
 const Doctor = ({navigation}) => {
-    useEffect(() => {
-        getData('user').then(res => {
-            console.log("datalocal : ", res);
-        }); 
-    }, [])
+    
     return (
         <View style={styles.page}>
             <View style={styles.content}>
