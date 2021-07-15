@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { Button, Gap, Header, Input, Loading } from '../../components';
 import { Firebase } from '../../config';
-import { colors, useForm } from '../../utils';
+import { colors, getData, storeData, useForm } from '../../utils';
 import { showMessage, hideMessage } from "react-native-flash-message";
 
 const Register = ({ navigation }) => {
@@ -22,14 +22,29 @@ const Register = ({ navigation }) => {
 
     const onContinue = () => {
         console.log(form);
-        
         setLoading(true)
         Firebase.auth().createUserWithEmailAndPassword(form.email, form.password)
             .then((success) => {
                 // Signed in
                 setForm('reset');
                 setLoading(false);
+
+                const data = {
+                    fullName: form.fullName,
+                    profession: form.profession,
+                    email: form.email,
+                    uid: success.user.uid
+                }
+
+                Firebase.database()
+                    .ref('users/' + success.user.uid + '/')
+                    .set(data)
+
+                storeData('user', data); 
+
                 console.log("Register Success", success);
+
+                navigation.navigate("UploadPhoto", data);
             })
             .catch((error) => {
                 var errorCode = error.code;
@@ -45,7 +60,6 @@ const Register = ({ navigation }) => {
                 console.log("Error Register", errorMessage);
             });
 
-        // () => navigation.navigate("UploadPhoto")
     };
     return (
         <>
@@ -81,7 +95,7 @@ const Register = ({ navigation }) => {
                     <Gap height={40} />
                 </ScrollView>
             </View>
-            {loading && <Loading/>}
+            {loading && <Loading />}
         </>
     );
 };

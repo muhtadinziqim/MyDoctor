@@ -1,11 +1,16 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { DoctorCategory, Gap, HomeProfile, NewsItem, RatedDoctor } from '../../components'
-import { colors, fonts } from '../../utils';
+import { colors, fonts, getData } from '../../utils';
 import { DummyDoctor6, JSONCategoryDoctor } from '../../assets'
 
 const Doctor = ({navigation}) => {
+    useEffect(() => {
+        getData('user').then(res => {
+            console.log("datalocal : ", res);
+        }); 
+    }, [])
     return (
         <View style={styles.page}>
             <View style={styles.content}>

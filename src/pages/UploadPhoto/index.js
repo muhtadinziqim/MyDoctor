@@ -1,24 +1,81 @@
-import React from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native'
-import { IconAddPhoto, ILNullPhoto } from '../../assets'
+import React, { useState } from 'react'
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import { IconAddPhoto, IconRemovePhoto, ILNullPhoto } from '../../assets'
 import { Button, Gap, Header, Link } from '../../components'
-import { colors, fonts } from '../../utils'
+import { colors, fonts, storeData } from '../../utils'
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+// import ImagePicker from 'react-native-image-picker';
+import { showMessage } from 'react-native-flash-message'
+import { Firebase } from '../../config'
 
-const UploadPhoto = ({navigation}) => {
+const UploadPhoto = ({ navigation, route }) => {
+
+    const { fullName, profession, uid } = route.params;
+
+    const [hasPhoto, setHasPhoto] = useState(false)
+    const [photo, setPhoto] = useState(ILNullPhoto)
+
+    const [photoForDB, setPhotoForDb] = useState('')
+
+    const getImage = () => {
+        launchImageLibrary({ includeBase64: true, quality: 0.5, maxHeight: 200, maxWidth: 200 }, (response) => {
+            // console.log("response", response.assets[0].uri);
+
+            if (response.didCancel) {
+                showMessage({
+                    message: 'Opps Sepertinya terjadi error',
+                    type: 'default',
+                    backgroundColor: colors.error,
+                    color: colors.white,
+                    duration: 5000
+                })
+            } else if (response.errorMessage) {
+                showMessage({
+                    message: response.errorMessage,
+                    type: 'default',
+                    backgroundColor: colors.error,
+                    color: colors.white,
+                    duration: 5000
+                })
+            } else {
+                console.log("Data Photo", response);
+                const photoDB = `data:${response.assets[0].type};base64, ${response.assets[0].base64}`
+                setPhotoForDb(photoDB); 
+                const source = { uri: response.assets[0].uri };
+                setPhoto(source);
+                setHasPhoto(true);
+            }
+        });
+    }
+
+    const uploadAndContinue = () => {
+        Firebase.database()
+            .ref('users/' + uid + '/')
+            .update({ photo: photoForDB })
+
+            const data = route.params;
+            data.photo = photoForDB;
+
+            storeData('user', data);
+
+            navigation.replace("MainApp")
+    }
+
     return (
         <View style={styles.page}>
             <Header title="Upload Photo" />
             <View style={styles.content}>
                 <View style={styles.profile} >
-                    <View style={styles.avatarWrapper} >
-                        <Image source={ILNullPhoto} style={styles.avatar} />
-                        <IconAddPhoto style={styles.addPhoto} />
-                    </View>
-                    <Text style={styles.name} >Ziqi Maulana</Text>
-                    <Text style={styles.profession} >Senior Programmer</Text>
+                    <TouchableOpacity style={styles.avatarWrapper} onPress={getImage} >
+                        <Image source={photo} style={styles.avatar} />
+                        {hasPhoto && <IconRemovePhoto style={styles.addPhoto} />}
+                        {!hasPhoto && <IconAddPhoto style={styles.addPhoto} />}
+                    </TouchableOpacity>
+                    <Text style={styles.name} >{fullName}</Text>
+                    <Text style={styles.profession} >{profession}</Text>
                 </View>
                 <View>
-                    <Button title="Upload and Continue" onPress={() => navigation.replace("MainApp")} />
+                    <Button disable={!hasPhoto} title="Upload and Continue" onPress={uploadAndContinue} />
                     <Gap height={30} />
                     <Link title="Skip for this" align="center" size={16} onPress={() => navigation.replace("MainApp")} />
                 </View>
@@ -44,7 +101,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-    },  
+    },
     avatarWrapper: {
         width: 130,
         height: 130,
@@ -57,6 +114,7 @@ const styles = StyleSheet.create({
     avatar: {
         width: 110,
         height: 110,
+        borderRadius: 110 / 2,
     },
     addPhoto: {
         position: 'absolute',
